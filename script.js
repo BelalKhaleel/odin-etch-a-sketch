@@ -1,112 +1,114 @@
-const board = document.querySelector(".board");
+const DEFAULT_NUMBER_OF_CELLS_PER_SIDE = 16;
+
 const enterButton = document.querySelector(".enter-btn");
-const buttonContainer = document.querySelector(".buttons");
-const blackButton = document.querySelector(".black");
-const randomColors = document.querySelector(".random-colors");
+const grid = document.querySelector(".container");
+const blackColorButton = document.querySelector(".black-btn");
+const colorPicker = document.querySelector(".color-picker");
+const randomColorsButton = document.querySelector(".random-colors-btn");
 const eraser = document.querySelector(".eraser");
-const resetButton = document.querySelector(".reset");
-const chosenColor = document.querySelector(".chosen-color");
+const clearButton = document.querySelector(".clear-btn");
 
-let color = "black";
-let coloring = false;
+const state = {
+  color: "black",
+  coloring: false,
+  randomColoring: false,
+};
 
-function populateBoard(cellsPerSide = 16) {
-  // Actual width of board
-  const boardSide = 550;
+if (state.color === "black") blackColorButton.classList.add("black-btn-active");
 
-  for (let i = 1; i <= cellsPerSide ** 2; i++) {
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
-    const cellSideLength = boardSide / cellsPerSide;
-    const cellSidePercentage = (cellSideLength * 100) / boardSide;
-    cell.style.width = cell.style.height = `${cellSidePercentage}%`;
-    board.appendChild(cell);
+function createCell(cellSideLengthPercentage) {
+  const cell = document.createElement("div");
+  cell.classList.add("cell");
+  cell.style.width = cell.style.height = `${cellSideLengthPercentage}%`;
+
+  cell.addEventListener("mouseenter", (e) => {
+    if (!state.coloring) return;
+    if (state.randomColoring) {
+      state.color =
+        "#" +
+        Math.floor(Math.random() * 16777215)
+          .toString(16)
+          .padStart(6, "0");
+    }
+    e.target.style.backgroundColor = state.color;
+  });
+
+  grid.appendChild(cell);
+}
+
+function populateGrid(cellsPerSide = DEFAULT_NUMBER_OF_CELLS_PER_SIDE) {
+  const totalCells = cellsPerSide ** 2;
+  const cellSideLengthPercentage = 100 / cellsPerSide;
+
+  for (let i = 1; i <= totalCells; i++) {
+    createCell(cellSideLengthPercentage);
   }
 }
 
-populateBoard();
+populateGrid();
 
-function selectRandomColor() {
-  if (!coloring) {
-    color = "white";
-  } else {
-    color = "#" + Math.floor(Math.random() * 16777215).toString(16);
-  }
+function resetBlackButtonStyles() {
+  blackColorButton.classList.remove("black-btn-active");
 }
 
-chosenColor.addEventListener("change", (e) => color = e.target.value);
-
-buttonContainer.addEventListener("click", (e) => {
-  let buttonClass = e.target.classList;
-
-  if (!buttonClass.contains("random-colors")) {
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach((cell) => {
-      cell.removeEventListener("mouseover", selectRandomColor);
-    });
-  }
-
-  if (buttonClass.contains("black")) {
-    color = "black";
-    blackButton.style.backgroundColor = "black";
-    blackButton.style.color = "white";
-    eraser.style.backgroundColor = "";
-    randomColors.style.backgroundColor = "";
-  } else if (buttonClass.contains("chosen-color")) {
-    blackButton.style.backgroundColor = "";
-    blackButton.style.color = "";
-    eraser.style.backgroundColor = "";
-    randomColors.style.backgroundColor = "";
-  } else if (buttonClass.contains("random-colors")) {
-    randomColors.style.backgroundColor =
-    "#" + Math.floor(Math.random() * 16777215).toString(16);
-    blackButton.style.backgroundColor = "";
-    blackButton.style.color = "";
-    eraser.style.backgroundColor = "";
-    e.stopPropagation();
-    const cells = document.querySelectorAll(".cell");
-    cells.forEach((cell) => {
-      cell.addEventListener("mouseover", selectRandomColor);
-    });
-  } else if (buttonClass.contains("eraser")) {
-    color = "white";
-    eraser.style.backgroundColor = "white";
-    blackButton.style.backgroundColor = "";
-    blackButton.style.color = "";
-    randomColors.style.backgroundColor = "";
-  } else {
-    eraser.style.backgroundColor = "";
-    blackButton.style.backgroundColor = "";
-    blackButton.style.color = "";
-    randomColors.style.backgroundColor = "";
-  }
-});
+function resetRandomColorsButton() {
+  randomColorsButton.classList.remove("random-colors-btn-active");
+  state.randomColoring = false;
+}
 
 enterButton.addEventListener("click", () => {
+  const inputValue = parseInt(document.querySelector("#nb-of-cells").value, 10);
+  const numOfCells =
+    inputValue >= 16 && inputValue <= 100
+      ? inputValue
+      : DEFAULT_NUMBER_OF_CELLS_PER_SIDE;
+  grid.innerHTML = "";
+  populateGrid(numOfCells);
+});
+
+blackColorButton.addEventListener("click", () => {
+  state.color = "black";
+  blackColorButton.classList.add("black-btn-active");
+  grid.classList.remove("grid-eraser-mode");
+  resetRandomColorsButton();
+});
+
+colorPicker.addEventListener("change", (e) => {
+  state.color = e.target.value;
+  grid.classList.remove("grid-eraser-mode");
+  resetBlackButtonStyles();
+  resetRandomColorsButton();
+});
+
+randomColorsButton.addEventListener("click", () => {
+  console.log("coloring:", state.coloring);
+  randomColorsButton.classList.add("random-colors-btn-active");
+  state.randomColoring = true;
+  grid.classList.remove("grid-eraser-mode");
+  resetBlackButtonStyles();
+});
+
+eraser.addEventListener("click", () => {
+  state.color = "white";
+  grid.classList.add("grid-eraser-mode");
+  resetBlackButtonStyles();
+  resetRandomColorsButton();
+});
+
+clearButton.addEventListener("click", () => {
   const cells = document.querySelectorAll(".cell");
-  if (cells) {
-    cells.forEach((cell) => board.removeChild(cell));
-  }
-  populateBoard(document.querySelector("#nb-of-cells").value);
+  cells.forEach((cell) => (cell.style.backgroundColor = "white"));
+  grid.classList.remove("grid-eraser-mode");
+  resetBlackButtonStyles();
+  resetRandomColorsButton();
 });
 
-board.addEventListener("click", (e) => {
+grid.addEventListener("mousedown", (e) => {
+  state.coloring = true;
   if (e.target.classList.contains("cell")) {
-    coloring = !coloring;
+    e.target.style.backgroundColor = state.color;
   }
 });
 
-board.addEventListener("mouseover", (e) => {
-  if (coloring) {
-    if (e.target.classList.contains("cell")) {
-      e.target.style.backgroundColor = color;
-    }
-  }
-});
-
-resetButton.addEventListener("click", () => {
-  const cells = document.querySelectorAll('.cell');
-  cells.forEach((cell) => {
-    cell.style.backgroundColor = "white";
-  });
-});
+grid.addEventListener("mouseup", () => (state.coloring = false));
+grid.addEventListener("mouseleave", () => (state.coloring = false));
