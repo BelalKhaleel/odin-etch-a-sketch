@@ -60,12 +60,17 @@ function resetRandomColorsButton() {
   state.randomColoring = false;
 }
 
+function parseGridSize(value) {
+  const parsedValue = parseInt(value, 10);
+  return parsedValue >= 16 && parsedValue <= 100
+    ? parsedValue
+    : DEFAULT_NUMBER_OF_CELLS_PER_SIDE;
+}
+
 enterButton.addEventListener("click", () => {
-  const inputValue = parseInt(document.querySelector("#nb-of-cells").value, 10);
-  const numOfCells =
-    inputValue >= 16 && inputValue <= 100
-      ? inputValue
-      : DEFAULT_NUMBER_OF_CELLS_PER_SIDE;
+  const numOfCells = parseGridSize(
+    document.querySelector("#nb-of-cells").value,
+  );
   grid.innerHTML = "";
   populateGrid(numOfCells);
 });
