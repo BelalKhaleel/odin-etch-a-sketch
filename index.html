@@ -9,29 +9,31 @@
     <title>Etch a Sketch</title>
   </head>
   <body>
-    <h1>Etch a Sketch</h1>
-    <div class="wrapper">
-      <div>
-        <label for="nb-of-cells"
-          >Please choose number of cells per side of the board:</label
-        >
-        <input
-          type="number"
-          id="nb-of-cells"
-          min="16"
-          max="100"
-          placeholder="min: 16 max: 100"
-        />
-        <button class="enter-btn" type="button">Enter</button>
-      </div>
-      <div class="container"></div>
-      <div class="buttons">
-        <button class="black-btn" type="button" value="black">Black</button>
-        <label for="color-picker">Choose color =></label>
-        <input class="color-picker" type="color" id="color-picker" />
-        <button class="random-colors-btn" type="button">Random Colors</button>
-        <button class="eraser" type="button">Eraser</button>
-        <button class="clear-btn" type="button">Clear</button>
+    <div class="content">
+      <h1>Etch a Sketch</h1>
+      <div class="wrapper">
+        <div>
+          <label for="nb-of-cells"
+            >Please choose number of cells per side of the board:</label
+          >
+          <input
+            type="number"
+            id="nb-of-cells"
+            min="16"
+            max="100"
+            placeholder="min: 16 max: 100"
+          />
+          <button class="enter-btn" type="button">Enter</button>
+        </div>
+        <div class="container"></div>
+        <div class="buttons">
+          <button class="black-btn" type="button" value="black">Black</button>
+          <label for="color-picker">Choose color =></label>
+          <input class="color-picker" type="color" id="color-picker" />
+          <button class="random-colors-btn" type="button">Random Colors</button>
+          <button class="eraser" type="button">Eraser</button>
+          <button class="clear-btn" type="button">Clear</button>
+        </div>
       </div>
     </div>
   </body>
