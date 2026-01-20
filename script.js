@@ -16,6 +16,15 @@ const state = {
 
 if (state.color === "black") blackColorButton.classList.add("black-btn-active");
 
+function getRandomHexColor() {
+  const hex =
+    "#" +
+    Math.floor(Math.random() * 16777215)
+      .toString(16)
+      .padStart(6, "0");
+  return hex;
+}
+
 function createCell(cellSideLengthPercentage) {
   const cell = document.createElement("div");
   cell.classList.add("cell");
@@ -23,14 +32,9 @@ function createCell(cellSideLengthPercentage) {
 
   cell.addEventListener("mouseenter", (e) => {
     if (!state.coloring) return;
-    if (state.randomColoring) {
-      state.color =
-        "#" +
-        Math.floor(Math.random() * 16777215)
-          .toString(16)
-          .padStart(6, "0");
-    }
-    e.target.style.backgroundColor = state.color;
+    e.target.style.backgroundColor = state.randomColoring
+      ? getRandomHexColor()
+      : state.color;
   });
 
   grid.appendChild(cell);
